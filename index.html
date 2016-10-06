@@ -1,11 +1,11 @@
 <html>
 <head>
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">  
-
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 <script type="text/javascript" src="lib/protovis-3.2/protovis-d3.2.js"></script>
 <script type="text/javascript" charset="utf-8" src="utils.js"></script>
 <script type="text/javascript" charset="utf-8" src="lib/lodash.underscore.min.js"></script>
+ <script type="text/javascript" src="lib/d3.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="radars/radarData.js"></script>
 
 <style type="text/css" media="screen">
@@ -16,18 +16,88 @@
 }
 
 </style>
+
+
 <script type="text/javascript" src="radar.js" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
 
 </script>
+
+
+<script type="text/javascript">
+    var exportPNG = function() {
+ 
+    
+    var svg = document.querySelector( "svg" );
+    var svgData = new XMLSerializer().serializeToString( svg );
+ 
+    var canvas = document.createElement( "canvas" );
+	 canvas.width = 1200;
+	canvas.height = 1000;
+    var ctx = canvas.getContext( "2d" );
+ 
+    var dataUri = '';
+    try {
+        dataUri = 'data:image/svg+xml;base64,' + btoa(svgData);
+    } catch (ex) {
+ 
+        // For browsers that don't have a btoa() method, send the text off to a webservice for encoding
+        /* Uncomment if needed (requires jQuery)
+        $.ajax({
+            url: "http://www.mysite.com/webservice/encodeString",
+            data: { svg: svgData },
+            type: "POST",
+            async: false,
+            success: function(encodedSVG) {
+                dataUri = 'data:image/svg+xml;base64,' + encodedSVG;
+            }
+        })
+        */
+ 
+    }
+ 
+    var img = document.createElement( "img" );
+ 
+    img.onload = function() {
+        ctx.drawImage( img,0, 0 );
+ 
+        try {
+ 
+            // Try to initiate a download of the image
+            var a = document.createElement("a");
+            a.download = "TechRadar_Export.png";
+            a.href = canvas.toDataURL("image/png");
+            document.querySelector("body").appendChild(a);
+            a.click();
+            document.querySelector("body").removeChild(a);
+ 
+        } catch (ex) {
+ 
+            // If downloading not possible (as in IE due to canvas.toDataURL() security issue)
+            // then display image for saving via right-click
+ 
+            var imgPreview = document.createElement("div");
+            imgPreview.appendChild(img);
+            document.querySelector("body").appendChild(imgPreview);
+ 
+        }
+    };
+ 
+    img.src = dataUri;
+ 
+}
+</script>
+
 
 </head>
 
 <body onload="init(h,w);">
 <h1 id="title" style="text-align: center;"></h1>
 <div id="radar"></div>
+
 <div>
-<p>^ Item in dispute, additional discussion and context to be provided.</p>
+<button onclick="exportPNG();">Export TechRadar</button>
+
 </div>
 </body>
 </html>
